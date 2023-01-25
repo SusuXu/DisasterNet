@@ -1,11 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# # Spatial Case
-
-# In[1]:
-
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -30,10 +22,6 @@ from model.model import DisasterNet
 from flow.flow import Planar
 from optimization.exp import run
 from util.data_loader import tr_Dataset
-
-
-# In[2]:
-
 
 parser = argparse.ArgumentParser(description='PyTorch Graphical VINF')
 
@@ -96,39 +84,33 @@ if args.cuda:
     torch.cuda.set_device(args.gpu_num)
 args.data_as_pseudo = False
 
-
-# ### Spatial experiment setup
-
-# In[3]:
-
-
-PLS = Image.open('/Users/xuechun/SBU Dropbox/Li Xuechun/Mac/Downloads/Code/Data/Haiti/newLS.tif')
+PLS = Image.open('/DisasterNet/DisasterNet/data/newLS.tif')
 PLS = torch.from_numpy(np.array(PLS)).float()
 a_LS = torch.from_numpy(np.array(PLS)).float()
 
-PLF = Image.open('/Users/xuechun/SBU Dropbox/Li Xuechun/Mac/Downloads/Code/Method/newLF.tif')
+PLF = Image.open('/DisasterNet/DisasterNet/data/newLF.tif')
 PLF = torch.from_numpy(np.array(PLF)).float()
 a_LF = torch.from_numpy(np.array(PLF)).float()
 
-PBD = Image.open('/Users/xuechun/SBU Dropbox/Li Xuechun/Mac/Downloads/Code/Method/newBD.tif')
+PBD = Image.open('/DisasterNet/DisasterNet/data/newBD.tif')
 PBD = torch.from_numpy(np.array(PBD)).float()
 a_BD = torch.from_numpy(np.array(PBD)).float()
 
-DPM = Image.open('/Users/xuechun/SBU Dropbox/Li Xuechun/Mac/Downloads/Code/Data/Haiti/DPM.tif')
+DPM = Image.open('/DisasterNet/DisasterNet/data/DPM.tif')
 DPM = torch.from_numpy(np.array(DPM)).float()
 X = torch.from_numpy(np.array(DPM)).float()
 
-q_LS_var = Image.open('/Users/xuechun/SBU Dropbox/Li Xuechun/Mac/Downloads/Code/Data/Haiti/Haiti_LS_uncertainty1.tif')
+q_LS_var = Image.open('/DisasterNet/DisasterNet/data/Haiti_LS_uncertainty1.tif')
 q_LS_var = torch.from_numpy(np.array(q_LS_var)).float()
 
-q_LF_var = Image.open('/Users/xuechun/SBU Dropbox/Li Xuechun/Mac/Downloads/Code/Data/Haiti/Haiti_LF_uncertainty1.tif')
+q_LF_var = Image.open('/DisasterNet/DisasterNet/data/Haiti_LF_uncertainty1.tif')
 q_LF_var = torch.from_numpy(np.array(q_LF_var)).float()
 
-BF = scipy.io.loadmat('/Users/xuechun/SBU Dropbox/Li Xuechun/Mac/Downloads/Code/Data/Haiti/BD.mat')
+BF = scipy.io.loadmat('/DisasterNet/DisasterNet/data/BD.mat')
 BF = BF['BD']
 BF = torch.from_numpy(np.array(BF)).float()
 
-LOCAL = scipy.io.loadmat('/Users/xuechun/SBU Dropbox/Li Xuechun/Mac/Downloads/Code/Data/Haiti/LOCAL.mat')
+LOCAL = scipy.io.loadmat('/DisasterNet/DisasterNet/data/LOCAL.mat')
 LOCAL = LOCAL['LOCAL']
 LOCAL = torch.from_numpy(np.array(LOCAL)).float()
 
@@ -219,9 +201,6 @@ amor_b = nn.Sequential(nn.Linear(args.batch_size, args.num_flows),
                        nn.Hardtanh(min_val=-1, max_val=1))
 
 
-# In[5]:
-
-
 # LS and LF part
 PLS_1 = w_aLS*PLS + w_0LS
 PLF_1 = w_aLF*PLF + w_0LF
@@ -258,10 +237,6 @@ b_LF = amor_b(PLF_1).view(-1, args.num_flows, 1, 1)
 log_det_j_LS = 0.
 log_det_j_LF = 0.
 log_det_j_BD = 0.
-
-
-# In[9]:
-
 
 for k in range(args.num_flows):
     q_LFk, log_det_jacobian_LF = flow_k(q_LF[k], u_LF[:, k, :, :], w_LF[:, k, :, :], b_LF[:, k, :, :])
@@ -313,19 +288,12 @@ q_BD_0 = q_BD[0]
 q_BD_K = q_BD[-1]
 
 
-# In[10]:
-
-
 scio.savemat('q_BD_K_1.mat',{'q_BD_K': q_BD_K.detach().numpy()})
 scio.savemat('q_LS_K_1.mat',{'q_LS_K': q_LS_K.detach().numpy()})
 scio.savemat('q_LF_K_1.mat',{'q_LF_K': q_LF_K.detach().numpy()})
 
 
 # #### Experiment Setup
-
-# In[13]:
-
-
 total_num = PLS.size(0)*PLS.size(1)
 bnum = np.floor(total_num/args.batch_size)
 rand_idx = np.array(random.sample(range(int(bnum)*args.batch_size),int(bnum)*args.batch_size))
