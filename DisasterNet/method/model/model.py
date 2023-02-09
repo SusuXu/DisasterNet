@@ -157,9 +157,8 @@ class DisasterNet(nn.Module):
         z_LF_K = z_LF[-1]  
         
         z_LS_K[z_LS_K != 0] = self.m(z_LS_K[z_LS_K != 0])
-        z_LS_K = (0.5*z_LS_K + a_LS)/1.5
         z_LF_K[z_LF_K != 0] = self.m(z_LF_K[z_LF_K != 0])
-        z_LF_K = (0.5*z_LF_K + a_LF)/1.5
+
 
         
         a_BD_1 = self.w_LSBD*z_LS_K.view(-1,self.batch_size) + self.w_LFBD*z_LF_K.view(-1,self.batch_size) + self.w_aBD*a_BD 
@@ -185,7 +184,7 @@ class DisasterNet(nn.Module):
         z_BD_0 = z_BD[0]
         z_BD_K = z_BD[-1]
         z_BD_K[z_BD_K!=0] = self.m(z_BD_K[z_BD_K!=0])
-        z_BD_K = (z_BD_K + a_BD)/2
+
 
         
         BD_inner_1 = torch.exp(- self.w_LSBD - self.w_LFBD)*z_LS_K*z_LF_K + (1-z_LS_K)*(1-z_LF_K) + torch.exp(-self.w_LSBD)*z_LS_K*(1-z_LF_K)+ torch.exp(-self.w_LFBD)*z_LF_K*(1-z_LS_K)
