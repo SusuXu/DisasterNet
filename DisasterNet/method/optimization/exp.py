@@ -80,7 +80,7 @@ def run(MyDataLoader,model,opt,test_PLS,test_PLF,test_PBD,IND):
                 loss = - torch.mean(log_p_xz) + beta * kl + penalty_LS + penalty_LF
             opt.zero_grad()
             loss.backward(retain_graph=True)
-    #         opt.step()
+            opt.step()
             train_loss[index] = loss.item()
             t_loss = loss.item()
             i += 1
